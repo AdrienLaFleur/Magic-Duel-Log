@@ -271,7 +271,7 @@
       result.innerText = "✨ กำลังบันทึกผลการแข่งขัน...";
 
       try {
-        await fetch("https://script.google.com/macros/s/AKfycbwYMTkZ6ikBgVU552YbsbrZY2FKUns77kUnQHMJaS3uQSL48laSnE76ayjSgq5qgtH5/exec", {
+        await fetch("https://script.google.com/macros/s/AKfycbzibqznCXbRW2CLnAoxJlESoGiCKSdAGDBmOF6qESh0EhC84YGN2OFpiUq3-YqooBft/exec", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -301,7 +301,7 @@
 
     async function loadLeaderboard() {
       try {
-        const res = await fetch("https://script.google.com/macros/s/AKfycbwYMTkZ6ikBgVU552YbsbrZY2FKUns77kUnQHMJaS3uQSL48laSnE76ayjSgq5qgtH5/exec");
+        const res = await fetch("https://script.google.com/macros/s/AKfycbzibqznCXbRW2CLnAoxJlESoGiCKSdAGDBmOF6qESh0EhC84YGN2OFpiUq3-YqooBft/exec");
         const data = await res.json();
         data.sort((a, b) => b.score - a.score);
         ranking.innerHTML = data.map((p, i) => `${i + 1}. ${p.name} (${p.score})`).join("<br>");
