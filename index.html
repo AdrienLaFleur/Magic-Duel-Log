@@ -221,102 +221,103 @@
 
   </div>
 
-  <script>
-    const form = document.getElementById("duelForm");
-    const result = document.getElementById("result");
-    const historyList = document.getElementById("historyList");
-    const ranking = document.getElementById("ranking");
+ <script>
+  const form = document.getElementById("duelForm");
+  const result = document.getElementById("result");
+  const historyList = document.getElementById("historyList");
+  const ranking = document.getElementById("ranking");
 
-    const firstName = document.getElementById("firstName");
-    const secondName = document.getElementById("secondName");
-    const thirdName = document.getElementById("thirdName");
+  const firstName = document.getElementById("firstName");
+  const secondName = document.getElementById("secondName");
+  const thirdName = document.getElementById("thirdName");
 
-    const spells = ["Expelliarmus", "Lumos", "Aguamenti", "Protego", "Incendio", "Stupefy", "Obliviate", "Accio", "Rictusempra", "Confundo"];
+  const spells = ["Expelliarmus", "Lumos", "Aguamenti", "Protego", "Incendio", "Stupefy", "Obliviate", "Accio", "Rictusempra", "Confundo"];
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-      const formData = new FormData(form);
-      const players = formData.get("players").split(",").map(p => p.trim()).filter(p => p);
-      const winner = formData.get("winner").trim();
-      const winScore = parseInt(formData.get("winScore"));
-      const judge = formData.get("judge").trim();
-      const dateInput = formData.get("date");
-      const formattedDate = dateInput || new Date().toISOString();
+    const formData = new FormData(form);
+    const players = formData.get("players").split(",").map(p => p.trim()).filter(p => p);
+    const winner = formData.get("winner").trim();
+    const winScore = parseInt(formData.get("winScore"));
+    const judge = formData.get("judge").trim();
+    const dateInput = formData.get("date");
+    const formattedDate = dateInput || new Date().toISOString();
 
-      result.className = "";
+    result.className = "";
 
-      if (!winner || !winScore || isNaN(winScore) || winScore < 1 || winScore > 3) {
-        result.innerText = "❌ กรุณาเลือกผู้ชนะและคะแนนที่ถูกต้อง (1-3)";
-        result.classList.add("error");
-        return;
-      }
-
-      if (!players.includes(winner)) {
-        result.innerText = "❌ ผู้ชนะต้องอยู่ในรายชื่อผู้เข้าแข่งขัน";
-        result.classList.add("error");
-        return;
-      }
-
-      if (players.length !== 2) {
-        result.innerText = "❌ ฟีเจอร์คะแนนอัตโนมัติใช้ได้เฉพาะเมื่อมีผู้เข้าแข่งขัน 2 คน";
-        result.classList.add("error");
-        return;
-      }
-
-      const loser = players.find(p => p !== winner);
-      const totalScore = 3;
-      const loserScore = totalScore - winScore;
-
-      result.innerText = "✨ กำลังบันทึกผลการแข่งขัน...";
-
-      try {
-        await fetch("https://script.google.com/macros/s/AKfycbzibqznCXbRW2CLnAoxJlESoGiCKSdAGDBmOF6qESh0EhC84YGN2OFpiUq3-YqooBft/exec", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            players: [winner, loser],
-            winners: [...Array(winScore).fill(winner), ...Array(loserScore).fill(loser)],
-            judge,
-            date: formattedDate
-          })
-        });
-
-        const spell = spells[Math.floor(Math.random() * spells.length)];
-
-        result.innerText = `✅ บันทึกสำเร็จ:\n${winner} ได้ ${winScore} คะแนน\n${loser} ได้ ${loserScore} คะแนน\n✨ คาถาเด่น: ${spell}`;
-        result.classList.add("success");
-
-        const item = document.createElement("li");
-        item.innerText = `${winner} (${winScore}) vs ${loser} (${loserScore}) โดย ${judge} – คาถา: ${spell} (${new Date(formattedDate).toLocaleString()})`;
-        historyList.prepend(item);
-
-        form.reset();
-        loadLeaderboard();
-      } catch (err) {
-        result.innerText = "❌ เกิดข้อผิดพลาด: " + err.message;
-        result.classList.add("error");
-      }
-    });
-
-    async function loadLeaderboard() {
-      try {
-        const res = await fetch("https://script.google.com/macros/s/AKfycbzibqznCXbRW2CLnAoxJlESoGiCKSdAGDBmOF6qESh0EhC84YGN2OFpiUq3-YqooBft/exec");
-        const data = await res.json();
-        data.sort((a, b) => b.score - a.score);
-        ranking.innerHTML = data.map((p, i) => `${i + 1}. ${p.name} (${p.score})`).join("<br>");
-
-        firstName.innerText = data[0] ? `${data[0].name} (${data[0].score})` : "-";
-        secondName.innerText = data[1] ? `${data[1].name} (${data[1].score})` : "-";
-        thirdName.innerText = data[2] ? `${data[2].name} (${data[2].score})` : "-";
-
-      } catch (err) {
-        console.error("โหลดอันดับล้มเหลว", err);
-      }
+    if (!winner || !winScore || isNaN(winScore) || winScore < 1 || winScore > 3) {
+      result.innerText = "❌ กรุณาเลือกผู้ชนะและคะแนนที่ถูกต้อง (1-3)";
+      result.classList.add("error");
+      return;
     }
 
-    loadLeaderboard();
-    setInterval(loadLeaderboard, 10000);
-  </script>
+    if (!players.includes(winner)) {
+      result.innerText = "❌ ผู้ชนะต้องอยู่ในรายชื่อผู้เข้าแข่งขัน";
+      result.classList.add("error");
+      return;
+    }
+
+    if (players.length !== 2) {
+      result.innerText = "❌ ฟีเจอร์คะแนนอัตโนมัติใช้ได้เฉพาะเมื่อมีผู้เข้าแข่งขัน 2 คน";
+      result.classList.add("error");
+      return;
+    }
+
+    const loser = players.find(p => p !== winner);
+    const totalScore = 3;
+    const loserScore = totalScore - winScore;
+
+    result.innerText = "✨ กำลังบันทึกผลการแข่งขัน...";
+
+    try {
+      await fetch("https://script.google.com/macros/s/AKfycbzibqznCXbRW2CLnAoxJlESoGiCKSdAGDBmOF6qESh0EhC84YGN2OFpiUq3-YqooBft/exec", {
+        method: "POST",
+        mode: "no-cors", // ✅ แก้ตรงนี้!
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          players: [winner, loser],
+          winners: [...Array(winScore).fill(winner), ...Array(loserScore).fill(loser)],
+          judge,
+          date: formattedDate
+        })
+      });
+
+      const spell = spells[Math.floor(Math.random() * spells.length)];
+
+      result.innerText = `✅ บันทึกสำเร็จ:\n${winner} ได้ ${winScore} คะแนน\n${loser} ได้ ${loserScore} คะแนน\n✨ คาถาเด่น: ${spell}`;
+      result.classList.add("success");
+
+      const item = document.createElement("li");
+      item.innerText = `${winner} (${winScore}) vs ${loser} (${loserScore}) โดย ${judge} – คาถา: ${spell} (${new Date(formattedDate).toLocaleString()})`;
+      historyList.prepend(item);
+
+      form.reset();
+      loadLeaderboard();
+    } catch (err) {
+      result.innerText = "❌ เกิดข้อผิดพลาด: " + err.message;
+      result.classList.add("error");
+    }
+  });
+
+  async function loadLeaderboard() {
+    try {
+      const res = await fetch("https://script.google.com/macros/s/AKfycbzibqznCXbRW2CLnAoxJlESoGiCKSdAGDBmOF6qESh0EhC84YGN2OFpiUq3-YqooBft/exec");
+      const data = await res.json();
+      data.sort((a, b) => b.score - a.score);
+      ranking.innerHTML = data.map((p, i) => `${i + 1}. ${p.name} (${p.score})`).join("<br>");
+
+      firstName.innerText = data[0] ? `${data[0].name} (${data[0].score})` : "-";
+      secondName.innerText = data[1] ? `${data[1].name} (${data[1].score})` : "-";
+      thirdName.innerText = data[2] ? `${data[2].name} (${data[2].score})` : "-";
+
+    } catch (err) {
+      console.error("โหลดอันดับล้มเหลว", err);
+    }
+  }
+
+  loadLeaderboard();
+  setInterval(loadLeaderboard, 10000);
+</script>
 </body>
 </html>
